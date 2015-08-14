@@ -1,6 +1,8 @@
 ---
-- name: CentOS | Install Testing centos7 repo
-  copy: src=virt7-testing.repo dest=/etc/yum.repos.d/virt7-testing.repo
+- name: centos | 7 -> Install virt7-testing repo
+  when: ansible_distribution_major_version|int == 7
+  template: src=virt7-testing.j2 dest=/etc/yum.repos.d/virt7-testing.repo owner=root mode=0644
 
-- name: CentOS | Install docker-common-candidate centos7 repo
-  copy: src=virt7-docker-common-candidate.repo dest=/etc/yum.repos.d/virt7-docker-common-candidate.repo
+- name: centos | 7 -> Install virt7-docker-common-candidate repo
+  when: ansible_distribution_major_version|int == 7
+  template: src=virt7-docker-common-candidate.j2 dest=/etc/yum.repos.d/virt7-docker-common-candidate.repo owner=root mode=0644

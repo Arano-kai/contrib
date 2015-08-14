@@ -1,0 +1,74 @@
+---
+- name: generic | Determine if Atomic
+  stat: path=/run/ostree-booted
+  register: s
+  changed_when: false
+
+- name: generic | Init the is_atomic fact
+  set_fact:
+    is_atomic: false
+
+- name: generic | Set the is_atomic fact
+  set_fact:
+    is_atomic: true
+  when: s.stat.exists
+
+- name: generic | Determine if has rpm
+  stat: path=/usr/bin/rpm
+  register: s
+  changed_when: false
+
+- name: generic | Init the has_rpm fact
+  set_fact:
+    has_rpm: false
+
+- name: generic | Set the has_rpm fact
+  set_fact:
+    has_rpm: true
+  when: s.stat.exists
+
+# TODO: move set to generic
+- name: generic | Init the has_firewalld fact
+  set_fact:
+    has_firewalld: false
+
+# TODO: move set to generic
+- name: generic | Init the has_iptables fact
+  set_fact:
+    has_iptables: false
+
+- name: generic | Init the is_rhel fact
+  set_fact:
+    is_rhel: false
+
+- name: generic | Set the is_rhel fact
+  set_fact:
+    is_rhel: true
+  when: ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: generic | Init the is_centos fact
+  set_fact:
+    is_centos: false
+
+- name: generic | Set the is_centos fact
+  set_fact:
+    is_centos: true
+  when: ansible_distribution == 'CentOS'
+
+- name: generic | Init the is_fedora fact
+  set_fact:
+    is_fedora: false
+
+- name: generic | Set the is_fedora fact
+  set_fact:
+    is_fedora: true
+  when: ansible_distribution == "Fedora"
+
+- name: generic | Init the is_debian fact
+  set_fact:
+    is_debian: false
+
+- name: generic | Set the is_debian fact
+  set_fact:
+    is_debian: true
+  when: ansible_distribution == "Debian"

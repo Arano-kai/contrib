@@ -1,0 +1,9 @@
+---
+- name: save iptables rules
+  command: service iptables save
+  notify:
+    - restart iptables
+
+- name: restart iptables
+  service: name=iptables state=restarted
+  when: inventory_hostname not in groups['nodes']

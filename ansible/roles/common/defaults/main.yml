@@ -1,0 +1,3 @@
+# Default for RHEL/Fedora/CentOS
+# For other distros set fact in ../task/{{ distro_name }}.yml
+daemon_config_dir: /etc/sysconfig

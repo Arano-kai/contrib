@@ -1,0 +1,13 @@
+---
+- name: fedora | 22+ -> Install minimal packages
+  action: "{{ ansible_pkg_mgr }}"
+  args:
+    name: "{{ item }}"
+    with_items:
+      - python # everyone need python2
+      - python-firewall
+      - python-dnf # some versions of ansible (2.0) use dnf directly
+      - yum # some versions of ansible use yum
+      - libselinux-python
+    state: latest
+  when: ansible_distribution_major_version|int >= 22

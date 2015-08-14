@@ -1,0 +1,23 @@
+---
+# Start before interaction,
+# any changes get flushed otherwise
+- name: iptables | Enable at boot
+  service: name=iptables enabled=yes state=started
+
+- name: iptables | Get rules
+  command: iptables -L
+  register: iptablesrules
+  always_run: yes
+  changed_when: false
+
+- name: iptables | Add chain for cluster rules
+  command: /sbin/iptables -N KUBECLUSTER
+  when: iptablesrules.stdout.find('Chain KUBECLUSTER') == -1
+  notify:
+    - save iptables rules
+
+- name: iptables | Redirect input to KUBECLUSTER chain
+  command: /sbin/iptables -I INPUT 1 -j KUBECLUSTER -m comment --comment "kubernetes cluster rules"
+  when: iptablesrules.stdout.find('kubernetes cluster rules') == -1
+  notify:
+    - save iptables rules

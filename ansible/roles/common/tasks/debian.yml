@@ -1,0 +1,5 @@
+---
+- name: debian | Change the daemon_config_dir fact
+  set_fact:
+    daemon_config_dir: "/etc/default"
+  when: is_debian

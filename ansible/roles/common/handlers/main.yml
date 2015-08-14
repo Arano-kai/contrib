@@ -1,0 +1,8 @@
+---
+# This handlers used by dependent roles.
+# TODO: Change to some loop (like 'with_fileglob')...
+
+- include: generic.yml
+- include: iptables.yml
+- include: docker.yml
+- include: kubernetes.yml

@@ -1,42 +1,57 @@
 ---
-- include: debian-install.yml
-  when: ansible_distribution == "Debian"
+- name: Init the did_install fact
+  set_fact:
+    did_install: false
 
-- include: generic-install.yml
-  when: ansible_distribution != "Debian"
+- include: debian.yml
+  when: is_debian
+
+- include: generic.yml
+  when: not is_atomic and not did_install
 
 - name: Verify docker config files exists
-  file: path={{ docker_config_dir }}/{{ item }} state=touch
+  file: path={{ daemon_config_dir }}/{{ item }} state=touch
   changed_when: false
   with_items:
     - docker
     - docker-network
 
+# This docker_btrfs fix left here for historical reason only    
+#- name: Get docker graph driver 
+#  command: findmnt -no FSTYPE -T /var/lib/docker
+#  register: docker_driver
+#  changed_when: false
+
+#- name: Turn down docker logging
+#  lineinfile: dest={{ daemon_config_dir }}/docker regexp=^OPTIONS= line=OPTIONS="--selinux-enabled{% if docker_driver.stdout == 'btrfs' %}=false{% endif %} --log-level=warn"
+#  notify:
+#   - restart docker
+
 - name: Turn down docker logging
-  lineinfile: dest={{ docker_config_dir }}/docker regexp=^OPTIONS= line=OPTIONS="--selinux-enabled --log-level=warn"
+  lineinfile: dest={{ daemon_config_dir }}/docker regexp=^OPTIONS= line=OPTIONS="--selinux-enabled --log-level=warn"
   notify:
     - restart docker
 
 - name: Install http_proxy into docker-network
-  lineinfile: dest={{ docker_config_dir }}/docker-network regexp=^HTTP_PROXY= line=HTTP_PROXY="{{ http_proxy }}"
+  lineinfile: dest={{ daemon_config_dir }}/docker-network regexp=^HTTP_PROXY= line=HTTP_PROXY="{{ http_proxy }}"
   when: http_proxy is defined
   notify:
     - restart docker
 
 - name: Install https_proxy into docker-network
-  lineinfile: dest={{ docker_config_dir }}/docker-network regexp=^HTTPS_PROXY= line=HTTPS_PROXY="{{ https_proxy }}"
+  lineinfile: dest={{ daemon_config_dir }}/docker-network regexp=^HTTPS_PROXY= line=HTTPS_PROXY="{{ https_proxy }}"
   when: https_proxy is defined
   notify:
     - restart docker
 
 - name: Install no-proxy into docker-network
-  lineinfile: dest={{ docker_config_dir }}/docker-network regexp=^NO_PROXY= line=NO_PROXY="{{ no_proxy }}"
+  lineinfile: dest={{ daemon_config_dir }}/docker-network regexp=^NO_PROXY= line=NO_PROXY="{{ no_proxy }}"
   when: no_proxy is defined
   notify:
     - restart docker
 
 - name: Add any insecure registrys to docker config
-  lineinfile: dest={{ docker_config_dir }}/docker regexp=^INSECURE_REGISTRY= line=INSECURE_REGISTRY='{% for reg in insecure_registrys %}--insecure-registry="{{ reg }}" {% endfor %}'
+  lineinfile: dest={{ daemon_config_dir }}/docker regexp=^INSECURE_REGISTRY= line=INSECURE_REGISTRY='{% for reg in insecure_registrys %}--insecure-registry="{{ reg }}" {% endfor %}'
   when: insecure_registrys is defined and insecure_registrys > 0
   notify:
     - restart docker

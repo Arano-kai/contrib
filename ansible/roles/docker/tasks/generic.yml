@@ -1,7 +1,16 @@
 ---
-- name: Generic | Install Docker
+- name: generic | Init temp facts
+  set_fact:
+    s: false
+
+- name: generic | Install Docker
   action: "{{ ansible_pkg_mgr }}"
   args:
     name: docker
     state: latest
-  when: not is_atomic
+  register: s
+
+- name: generic | Say we install package
+  set_fact:
+    did_install: true
+  when: s.rc == 0

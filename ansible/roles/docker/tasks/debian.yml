@@ -1,10 +1,20 @@
 ---
-- name: DEBIAN | Make sure this is stretch or sid, jessies does not have docker
+- name: debian | Make sure this is stretch or sid, jessies does not have docker
   fail: msg="Docker.io only available in sid and stretch, https://wiki.debian.org/Docker"
   when: ansible_lsb.codename != "stretch" and ansible_lsb.codename != "sid"
 
-- name: DEBIAN | Install Docker
+- name: debian | Init temp facts
+  set_fact:
+    s: false
+
+- name: debian | Install Docker
   action: "{{ ansible_pkg_mgr }}"
   args:
     name: docker.io
     state: latest
+  register: s
+
+- name: debian | Say we install package
+  set_fact:
+    did_install: true
+  when: s.rc == 0

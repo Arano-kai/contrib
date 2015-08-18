@@ -1,6 +1,6 @@
 ---
 - include: fedora.yml
-  when: ansible_distribution == "Fedora"
+  when: is_fedora
 
 - name: Update {{ kube_script_dir }} if this is atomic
   set_fact:

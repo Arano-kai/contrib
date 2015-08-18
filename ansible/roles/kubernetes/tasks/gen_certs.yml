@@ -1,5 +1,5 @@
 ---
-- name: Install openssl for easy-rsa stuff
+- name: secrets | gen_certs | Install openssl for easy-rsa stuff
   action: "{{ ansible_pkg_mgr }}"
   args:
     name: "{{ item }}"
@@ -9,13 +9,13 @@
     - curl
   when: not is_atomic
 
-#- name: Get create ca cert script from Kubernetes
+#- name: secrets | gen_certs | Get create ca cert script from Kubernetes
 #  get_url:
 #    url=https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes/master/cluster/saltbase/salt/generate-cert/make-ca-cert.sh
 #    dest={{ kube_script_dir }}/make-ca-cert.sh mode=0500
 #    force=yes
 
-- name: HACK | overwrite make-ca-cert.sh from local copy
+- name: secrets | gen_certs | HACK -> Overwrite make-ca-cert.sh from local copy
   copy:
     src=make-ca-cert.sh
     dest={{ kube_script_dir }}
@@ -23,7 +23,7 @@
   changed_when: false
 
 # FIXME This only generates a cert for one master...
-- name: Run create cert script on master
+- name: secrets | gen_certs | Run create cert script on master
   command:
     "{{ kube_script_dir }}/make-ca-cert.sh"
   args:
@@ -36,7 +36,7 @@
     CERT_DIR: "{{ kube_cert_dir }}"
     CERT_GROUP: "{{ kube_cert_group }}"
 
-- name: Verify certificate permissions
+- name: secrets | gen_certs | Verify certificate permissions
   file:
     path={{ item }}
     group={{ kube_cert_group }}

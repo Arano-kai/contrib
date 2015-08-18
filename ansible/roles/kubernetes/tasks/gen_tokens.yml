@@ -1,11 +1,11 @@
 ---
-- name: Copy the token gen script
+- name: secrets | gen_tokens | Copy the token gen script
   copy:
     src=kube-gen-token.sh
     dest={{ kube_script_dir }}
     mode=u+x
 
-- name: Generate tokens for master components
+- name: secrets | gen_tokens | Generate tokens for master components
   command: "{{ kube_script_dir }}/kube-gen-token.sh {{ item[0] }}-{{ item[1] }}"
   environment:
     TOKEN_DIR: "{{ kube_token_dir }}"
@@ -17,7 +17,7 @@
   notify:
     - restart daemons
 
-- name: Generate tokens for node components
+- name: secrets | gen_tokens | Generate tokens for node components
   command: "{{ kube_script_dir }}/kube-gen-token.sh {{ item[0] }}-{{ item[1] }}"
   environment:
     TOKEN_DIR: "{{ kube_token_dir }}"

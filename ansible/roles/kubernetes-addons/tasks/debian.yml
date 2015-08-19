@@ -1,16 +1,16 @@
 ---
-- name: generic | Init temp facts
+- name: debian | Init temp facts
   set_fact:
     s: false
 
-- name: generic | Install PyYAML
+- name: debian | Install PyYAML
   action: "{{ ansible_pkg_mgr }}"
   args:
-    name: PyYAML 
+    name: python-yaml
     state: latest
   register: s
 
-- name: generic | Say we install package
+- name: debian | Say we install package
   set_fact:
     package_installed: true
   when: s.rc == 0

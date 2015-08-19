@@ -2,8 +2,15 @@
 - name: Assures addons dir exists
   file: path={{ kube_addons_dir }} state=directory
 
-- include: generic-install.yml
-  when: not is_atomic
+- name: Init the package_installed fact
+  set_fact:
+    package_installed: false
+
+- include: debian.yml
+  when: is_debian
+
+- include: generic.yml
+  when: not is_atomic and not package_installed
 
 - name: Assures local addon dir exists
   local_action: file
@@ -64,7 +71,8 @@
 - name: Install kube-addons service
   template: src=kube-addons.service.j2 dest=/etc/systemd/system/kube-addons.service
   notify:
-    - reload and restart kube-addons
+    - reload systemd
+    - restart kube-addons
 
 - name: Enable and start kube addons
   service: name=kube-addons.service enabled=yes state=started

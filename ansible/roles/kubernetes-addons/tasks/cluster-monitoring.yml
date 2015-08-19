@@ -1,8 +1,8 @@
 ---
-- name: MONITORING | Assures {{ kube_config_dir }}/addons/cluster-monitoring dir exists
+- name: kluster-monitoring | Assures {{ kube_config_dir }}/addons/cluster-monitoring dir exists
   file: path={{ kube_addons_dir }}/cluster-monitoring state=directory
 
-- name: MONITORING | Download monitoring files from Kubernetes repo
+- name: kluster-monitoring | Download files from Kubernetes repo
   get_url:
     url=https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes/master/cluster/addons/cluster-monitoring/influxdb/{{ item }}
     dest="{{ kube_addons_dir }}/cluster-monitoring/"

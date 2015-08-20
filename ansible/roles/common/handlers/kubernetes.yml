@@ -1,7 +1,20 @@
 ---
 - name: restart kubelet
-  service: name=kubelet state=restarted
+  command: /bin/true
+  notify:
+    - check kubelet existence
+    - restart kubelet service
   when: inventory_hostname in groups['nodes']
+
+- name: check kubelet existence
+  command: "kubelet --version=true"  
+  register: has_kubelet
+  failed_when: false
+  changed_when: false
+
+- name: restart kubelet service
+  service: name=kubelet state=restarted
+  when: has_kubelet.rc|int != 2
 
 - name: restart proxy
   service: name=kube-proxy state=restarted

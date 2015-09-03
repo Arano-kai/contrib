@@ -1,5 +1,5 @@
 ---
-- name: Copy master binaries
+- name: localBuildInstall | Copy master binaries
   copy:
     src: ../../kubernetes/_output/local/go/bin/{{ item }}
     dest: /usr/bin/
@@ -11,7 +11,7 @@
     - kubectl
   notify: restart daemons
 
-- name: Copy master service files
+- name: localBuildInstall | Copy master service files
   copy:
     src: ../init/systemd/{{ item }}
     dest: /etc/systemd/system/
@@ -22,7 +22,7 @@
     - kube-controller-manager.service
   notify: reload systemd
 
-- name: Copy systemd tmpfile for apiserver
+- name: localBuildInstall | Copy systemd tmpfile for apiserver
   copy:
     src: ../init/systemd/tmpfiles.d/
     dest: /etc/tmpfiles.d/

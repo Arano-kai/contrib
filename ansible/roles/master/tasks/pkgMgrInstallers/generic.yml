@@ -1,7 +1,18 @@
-- name: Generic | Install kubernetes master
+---
+- name: packageManagerInstall | generic | Init temp facts
+  set_fact:
+    s: false
+
+- name: packageManagerInstall | generic | Install kubernetes-master
   action: "{{ ansible_pkg_mgr }}"
   args:
     name: kubernetes-master
     state: latest
+  register: s
   notify:
     - restart daemons
+
+- name: packageManagerInstall | generic | Say we install package
+  set_fact:
+    did_install: true
+  when: s.rc == 0

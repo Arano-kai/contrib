@@ -1,5 +1,5 @@
 ---
-- name: Copy node binaries
+- name: localBuildInstall | Copy node binaries
   copy:
     src: ../../kubernetes/_output/local/go/bin/{{ item }}
     dest: /usr/bin/
@@ -11,7 +11,7 @@
   notify:
     - restart daemons
 
-- name: Copy node service files
+- name: localBuildInstall | Copy node service files
   copy:
     src: ../init/systemd/{{ item }}
     dest: /etc/systemd/system/
@@ -21,7 +21,7 @@
     - kubelet.service
   notify: reload systemd
 
-- name: Create the /var/lib/kubelet working directory
+- name: localBuildInstall | Create the /var/lib/kubelet working directory
   file:
     path: /var/lib/kubelet
     state: directory

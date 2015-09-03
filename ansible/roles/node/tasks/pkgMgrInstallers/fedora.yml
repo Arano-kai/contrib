@@ -1,8 +1,19 @@
-- name: Fedora | Install kubernetes node
+- name: packageManagerInstall | fedora | Init temp facts
+  set_fact:
+    s: false
+
+- name: packageManagerInstall | fedora | Install kubernetes-node
   action: "{{ ansible_pkg_mgr }}"
   args:
     name: kubernetes-node
     state: latest
     enablerepo: "updates-testing"
+  register: s
+  when: ansible_distribution_release != "Rawhide"
   notify:
     - restart daemons
+
+- name: packageManagerInstall | fedora | Say we install package
+  set_fact:
+    did_install: true
+  when: s.rc == 0

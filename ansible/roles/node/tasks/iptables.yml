@@ -1,20 +1,21 @@
 ---
-- name: Get iptables rules
+- name: iptables | Enable at boot
+  service: name=iptables enabled=yes state=started
+
+- name: iptables | Get rules
   command: iptables -L --wait
   register: iptablesrules
   always_run: yes
+  changed_when: false
 
-- name: Enable iptables at boot
-  service: name=iptables enabled=yes state=started
+- name: iptables | Open kubelet port
+  command: /sbin/iptables -I KUBECLUSTER 1 -p tcp --dport 10250 -j ACCEPT -m comment --comment "kubelet"
+  when: iptablesrules.stdout.find('kubelet') == -1
+  notify:
+    - save iptables rules
 
-- name: Open kubelet port with iptables
-  command: /sbin/iptables -I INPUT 1 -p tcp --dport 10250 -j ACCEPT -m comment --comment "kubelet"
-  when: "'kubelet' not in iptablesrules.stdout"
-
-- name: Allow redirected service traffic
-  command: /sbin/iptables -I INPUT 1 -i docker0
-      -j ACCEPT -m comment --comment "kube-proxy redirects"
-
-- name: Save iptables rules
-  command: service iptables save
-  when: "'kubelet' not in iptablesrules.stdout"
+- name: iptables | Allow redirected service traffic
+  command: /sbin/iptables -I KUBECLUSTER 1 -i docker0 -j ACCEPT -m comment --comment "kube-proxy redirects"
+  when: iptablesrules.stdout.find('kube-proxy redirects') == -1
+  notify:
+    - save iptables rules

@@ -1,8 +1,19 @@
 ---
-- name: CentOS | Install kubernetes node
+- name: packageManagerInstall | centos | Init temp facts
+  set_fact:
+    s: false
+
+- name: packageManagerInstall | centos | 7 -> Install kubernetes-node
   yum:
     pkg=kubernetes-node
     state=latest
     enablerepo=virt7-docker-common-candidate
+  register: s
+  when: ansible_distribution_major_version|int == 7
   notify:
     - restart daemons
+
+- name: packageManagerInstall | centos | Say we install package
+  set_fact:
+    did_install: true
+  when: s.rc == 0

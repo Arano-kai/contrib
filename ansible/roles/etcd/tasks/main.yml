@@ -2,8 +2,8 @@
 - name: Install etcd
   action: "{{ ansible_pkg_mgr }}"
   args:
-        name: etcd
-        state: latest
+    name: etcd
+    state: latest
   notify:
     - restart etcd
   when: not is_atomic
@@ -18,7 +18,7 @@
   notify:
     - reload systemd
     - restart etcd
-  when: ansible_distribution == "Debian"
+  when: is_debian
 
 - name: Enable etcd
   service: name=etcd enabled=yes
